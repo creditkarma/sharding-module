@@ -1,9 +1,10 @@
 defaults: &defaults
   working_directory: ~/shard-manager
   docker:
-    - image: circleci/node:6.10.3
+    - image: circleci/node:8.9.4
 
 version: 2
+executorType: machine
 jobs:
   test:
     <<: *defaults

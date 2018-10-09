@@ -149,7 +149,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
         // There should be a result set for each shard.
         expect(resultSets).length(4)
 
-        const results = resultSets.reduce((flattened, element) => {
+        const results: Array<any> = resultSets.reduce((flattened, element) => {
             return flattened.concat(element, [])
         })
 

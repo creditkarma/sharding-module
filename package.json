@@ -4,13 +4,25 @@
   "description": "",
   "main": "lib/main/index.js",
   "types": "lib/main/index.d.ts",
+  "files": [
+    "lib/main"
+  ],
+  "keywords": [
+    "TypeScript",
+    "Node.js",
+    "database",
+    "sharding",
+    "mysql"
+  ],
   "scripts": {
     "clean": "rimraf ./coverage ./lib ./**/codegen",
+    "clean-all": "npm run clean && rimraf node_modules ./package-lock.json",
     "prebuild": "npm run clean",
     "build": "npm run lint && tsc",
     "build:watch": "tsc --watch",
     "lint": "tslint --fix src/**/*.ts",
     "test": "npm run test:unit && npm run test:integration",
+    "test:pr": "npm run build && npm run test",
     "test:unit": "lab src/tests/unit/",
     "pretest:integration": "docker-compose --file src/tests/integration/docker-compose.yml up --force-recreate --detach",
     "test:integration": "lab src/tests/integration/",
@@ -25,17 +37,17 @@
   "devDependencies": {
     "@types/code": "^4.0.4",
     "@types/lab": "^11.1.0",
-    "@types/mysql": "^2.15.4",
-    "code": "^4.1.0",
+    "@types/mysql": "^2.15.5",
+    "code": "^5.2.0",
     "lab": "^16.1.0",
     "lab-transform-typescript": "^3.0.1",
-    "mysql": "^2.15.0",
+    "mysql": "^2.1.0",
     "node-murmurhash": "^2.1.0",
     "rimraf": "^2.6.2",
-    "tslint": "^5.9.1",
-    "typescript": "^2.7.2"
+    "tslint": "^5.11.0",
+    "typescript": "3.1.x"
   },
   "dependencies": {
-    "@types/node": "^10.1.1"
+    "@types/node": "^10.11.6"
   }
 }

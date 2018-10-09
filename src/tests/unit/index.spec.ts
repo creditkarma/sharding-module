@@ -108,18 +108,6 @@ describe('Shard Manager', () => {
 
     describe('getClient', () => {
         it('should get the correct client', async () => {
-            const localhost = {
-                host: 'localhost',
-                port: 3306,
-                user: 'testuser',
-                password: 'testpassword',
-            }
-            const notLocalhost = {
-                host: 'not-localhost.com',
-                port: 1337,
-                user: 'testuser',
-                password: 'testpassword',
-            }
             const testCases: Array<[number, {}]> = [
                 [0, { host: 'localhost', port: 3306, database: 'tests_0000' }],
                 [1, { host: 'localhost', port: 3306, database: 'tests_0001' }],
