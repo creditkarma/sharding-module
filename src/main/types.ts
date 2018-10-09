@@ -39,5 +39,6 @@ export interface IShardManager<Client> {
     getShard(shardid: number | string): number
     pickRandomShard(): number
     getClient(num: number, schema: string): Client
+    getNumShards(): number
     doForAllShards<Result>(op: ShardOperation<Result>): Promise<Array<Result>>
 }
