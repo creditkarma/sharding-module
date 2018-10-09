@@ -2,7 +2,7 @@ import { expect } from 'code'
 import * as Lab from 'lab'
 import * as mysql from 'mysql'
 import * as murmurhash from 'node-murmurhash'
-import shardMgr, { ISettingsObj, IShardInstance } from '../../main/index'
+import { createShardManager as shardMgr, ISettingsObj, IShardInstance } from '../../main/index'
 import { arbitraryInteger } from '../helpers/generators'
 
 export const lab = Lab.script()

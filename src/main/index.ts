@@ -7,9 +7,9 @@ import {
 
 export * from './types'
 
-export default <Client>(
+export function createShardManager<Client>(
     config: ISettingsObj<Client>,
     logger: ILogger,
-): IShardManager<Client> => {
+): IShardManager<Client> {
     return new ShardManager(config, logger)
 }
