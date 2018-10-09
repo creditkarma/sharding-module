@@ -15,7 +15,7 @@ jobs:
           command: npm install
       - run:
           name: Run Test Suite
-          command: npm test
+          command: npm run test:pr
 
 workflows:
   version: 2
