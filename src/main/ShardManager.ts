@@ -3,8 +3,8 @@ import {
     ILogger,
     ISettingsObj,
     IShardInstance,
-    ShardOperation,
     IShardManager,
+    ShardOperation,
 } from './types'
 
 export class ShardManager<Client> implements IShardManager<Client> {
