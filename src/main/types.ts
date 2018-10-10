@@ -1,8 +1,8 @@
 export interface ILogger {
-    log: (input: any) => void,
-    error: (input: any) => void,
-    warn: (input: any) => void,
-    debug: (input: any) => void,
+    log: (input: any) => void
+    error: (input: any) => void
+    warn: (input: any) => void
+    debug: (input: any) => void
 }
 
 export interface IShardInstance {
@@ -32,8 +32,7 @@ export type ClientCreator<Client> = (
 
 export type HashFunction = (s: string, n: number) => number
 
-export type ShardOperation<Result> =
-    (shard: number) => Promise<Result>
+export type ShardOperation<Result> = (shard: number) => Promise<Result>
 
 export interface IShardManager<Client> {
     getShard(shardid: number | string): number

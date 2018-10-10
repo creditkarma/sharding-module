@@ -1,9 +1,5 @@
 import { ShardManager } from './ShardManager'
-import {
-    ILogger,
-    ISettingsObj,
-    IShardManager,
-} from './types'
+import { ILogger, ISettingsObj, IShardManager } from './types'
 
 export * from './types'
 
