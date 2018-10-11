@@ -52,7 +52,9 @@ export class ShardManager<Client> implements IShardManager<Client> {
         }
     }
 
-    public doForAllShards<Result>(op: ShardOperation<Result>): Promise<Array<Result>> {
+    public doForAllShards<Result>(
+        op: ShardOperation<Result>,
+    ): Promise<Array<Result>> {
         const requests: Array<Promise<Result>> = []
         for (let i = 0; i < this.numShards; i++) {
             const q = op(i)
@@ -77,14 +79,17 @@ export class ShardManager<Client> implements IShardManager<Client> {
             prefixes
                 .map((prefix: string) => this.getShardName(shardIndex, prefix))
                 .forEach((databaseName: string) => {
-                    this.shards[databaseName] = this.settings.createClient(databaseName, shardSettings)
+                    this.shards[databaseName] = this.settings.createClient(
+                        databaseName,
+                        shardSettings,
+                    )
                 })
         }
     }
 
     private findSettingsForShard(num: number): IShardInstance {
         const shardList = this.settings.sharding['shard-map']
-        const shard = shardList.find((s) => {
+        const shard = shardList.find(s => {
             return s['virtual-start'] <= num && s['virtual-end'] >= num
         })
         if (!shard) {
