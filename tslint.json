@@ -11,25 +11,9 @@
       false
     ],
     "no-var-requires": false,
-    "semicolon": [
-      true,
-      "never"
-    ],
     "array-type": [
       true,
       "generic"
-    ],
-    "quotemark": [
-      true,
-      "single",
-      "avoid-escape"
-    ],
-    "trailing-comma": [
-      true,
-      {
-        "multiline": "always",
-        "singleline": "never"
-      }
     ]
   }
 }
