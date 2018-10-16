@@ -52,6 +52,17 @@ export class ShardManager<Client> implements IShardManager<Client> {
         }
     }
 
+    public updateClient(num: number, schema: string): Client {
+        const shardName = this.getShardName(num, schema)
+        const shardIndex = this.getShard(num)
+        const shardSettings = this.findSettingsForShard(shardIndex)
+        this.shards[shardName] = this.settings.createClient(
+            shardName,
+            shardSettings,
+        )
+        return this.shards[shardName]
+    }
+
     public doForAllShards<Result>(
         op: ShardOperation<Result>,
         args: any,
@@ -62,6 +73,17 @@ export class ShardManager<Client> implements IShardManager<Client> {
             requests.push(q)
         }
         return Promise.all(requests)
+    }
+
+    public findSettingsForShard(num: number): IShardInstance {
+        const shardList = this.settings.sharding['shard-map']
+        const shard = shardList.find(s => {
+            return s['virtual-start'] <= num && s['virtual-end'] >= num
+        })
+        if (!shard) {
+            throw new Error(`no shard found for ${num}`)
+        }
+        return shard
     }
 
     private init() {
@@ -86,17 +108,6 @@ export class ShardManager<Client> implements IShardManager<Client> {
                     )
                 })
         }
-    }
-
-    private findSettingsForShard(num: number): IShardInstance {
-        const shardList = this.settings.sharding['shard-map']
-        const shard = shardList.find(s => {
-            return s['virtual-start'] <= num && s['virtual-end'] >= num
-        })
-        if (!shard) {
-            throw new Error(`no shard found for ${num}`)
-        }
-        return shard
     }
 
     private getShardName(num: number, schema: string): string {
