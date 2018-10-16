@@ -21,7 +21,9 @@ function getDbConnection(): mysql.Connection {
 
 describe('Integration Tests', { timeout: 30000 }, () => {
     it('should be able to talk to the database', async () => {
-        const result = await retry(() => query(getDbConnection(), 'SELECT "hello world" AS foo'))
+        const result = await retry(() =>
+            query(getDbConnection(), 'SELECT "hello world" AS foo'),
+        )
         expect(result).to.equal([{ foo: 'hello world' }])
     })
 })
@@ -30,14 +32,14 @@ describe('Shard Manager', { timeout: 30000 }, () => {
     const sm = shardMgr(
         {
             sharding: {
-                'prefix': ['example_todoId'],
+                prefix: ['example_todoId'],
                 'shard-count': 4,
                 'shard-map': [
                     {
                         'virtual-start': 0,
                         'virtual-end': 3,
-                        'host': 'localhost',
-                        'port': 3306,
+                        host: 'localhost',
+                        port: 3306,
                     },
                 ],
             },
@@ -63,21 +65,33 @@ describe('Shard Manager', { timeout: 30000 }, () => {
             // DB interactions performed by this test suite, slap a retry
             // policy on them to tolerate the slow startup.
             retry(() =>
-                query(getDbConnection(), 'CREATE DATABASE IF NOT EXISTS example_todoId_0000'),
+                query(
+                    getDbConnection(),
+                    'CREATE DATABASE IF NOT EXISTS example_todoId_0000',
+                ),
             ),
             retry(() =>
-                query(getDbConnection(), 'CREATE DATABASE IF NOT EXISTS example_todoId_0001'),
+                query(
+                    getDbConnection(),
+                    'CREATE DATABASE IF NOT EXISTS example_todoId_0001',
+                ),
             ),
             retry(() =>
-                query(getDbConnection(), 'CREATE DATABASE IF NOT EXISTS example_todoId_0002'),
+                query(
+                    getDbConnection(),
+                    'CREATE DATABASE IF NOT EXISTS example_todoId_0002',
+                ),
             ),
             retry(() =>
-                query(getDbConnection(), 'CREATE DATABASE IF NOT EXISTS example_todoId_0003'),
+                query(
+                    getDbConnection(),
+                    'CREATE DATABASE IF NOT EXISTS example_todoId_0003',
+                ),
             ),
         ]).then(() =>
-            sm.doForAllShards((shardIndex) => {
+            sm.doForAllShards(shardIndex => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
-                return query(client, 'DROP TABLE IF EXISTS todos').then((_) =>
+                return query(client, 'DROP TABLE IF EXISTS todos').then(_ =>
                     query(
                         client,
                         `CREATE TABLE todos (
@@ -109,7 +123,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
             client,
             'INSERT INTO todos SET ?',
             todo,
-        ).then((_) =>
+        ).then(_ =>
             query(client, 'SELECT * FROM todos WHERE todoId = ?', [
                 todo.todoId,
             ]),
@@ -134,13 +148,16 @@ describe('Shard Manager', { timeout: 30000 }, () => {
             { todoId: arbitraryInteger(), name: 'take over the world' },
         ]
         const resultSets = await Promise.all(
-            todos.map((todo) => {
+            todos.map(todo => {
                 const todoShardIndex = sm.getShard(todo.todoId)
-                const todoClient = sm.getClient(todoShardIndex, 'example_todoId')
+                const todoClient = sm.getClient(
+                    todoShardIndex,
+                    'example_todoId',
+                )
                 return query(todoClient, 'INSERT INTO todos SET ?', todo)
             }),
         ).then(() => {
-            return sm.doForAllShards((shardIndex) => {
+            return sm.doForAllShards(shardIndex => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
                 return query(client, 'SELECT * FROM todos')
             })
@@ -154,8 +171,8 @@ describe('Shard Manager', { timeout: 30000 }, () => {
         })
 
         expect(results).length(todos.length)
-        todos.forEach((todo) => {
-            const relevantResult = results.find((result) => {
+        todos.forEach(todo => {
+            const relevantResult = results.find(result => {
                 return result.todoId === todo.todoId
             })
             expect(relevantResult).to.equal({
@@ -171,7 +188,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
         const client = sm.getClient(shard, 'example_todoId')
 
         await query(client, 'this is not a valid SQL string')
-            .then((_) => fail('execution should not reach here'))
-            .catch((err) => expect(err).to.error(Error, /\bER_PARSE_ERROR\b/))
+            .then(_ => fail('execution should not reach here'))
+            .catch(err => expect(err).to.error(Error, /\bER_PARSE_ERROR\b/))
     })
 })

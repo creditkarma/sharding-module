@@ -20,7 +20,7 @@
     "prebuild": "npm run clean",
     "build": "npm run lint && tsc",
     "build:watch": "tsc --watch",
-    "lint": "tslint --fix src/**/*.ts",
+    "lint": "tslint --fix 'src/**/*.ts'",
     "test": "npm run test:unit && npm run test:integration",
     "test:pr": "npm run build && npm run test",
     "test:unit": "lab src/tests/unit/",
