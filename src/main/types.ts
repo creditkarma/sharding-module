@@ -32,12 +32,18 @@ export type ClientCreator<Client> = (
 
 export type HashFunction = (s: string, n: number) => number
 
-export type ShardOperation<Result> = (shard: number) => Promise<Result>
+export type ShardOperation<Result> = (
+    shard: number,
+    opts: any,
+) => Promise<Result>
 
 export interface IShardManager<Client> {
     getShard(shardid: number | string): number
     pickRandomShard(): number
     getClient(num: number, schema: string): Client
     getNumShards(): number
-    doForAllShards<Result>(op: ShardOperation<Result>): Promise<Array<Result>>
+    doForAllShards<Result>(
+        op: ShardOperation<Result>,
+        args: any,
+    ): Promise<Array<Result>>
 }

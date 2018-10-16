@@ -54,10 +54,11 @@ export class ShardManager<Client> implements IShardManager<Client> {
 
     public doForAllShards<Result>(
         op: ShardOperation<Result>,
+        args: any,
     ): Promise<Array<Result>> {
         const requests: Array<Promise<Result>> = []
         for (let i = 0; i < this.numShards; i++) {
-            const q = op(i)
+            const q = op(i, args)
             requests.push(q)
         }
         return Promise.all(requests)
