@@ -10,6 +10,8 @@ export interface IShardInstance {
     'virtual-end': number
     host: string
     port: number
+    user: string
+    password: string
 }
 
 export interface IShardObj {

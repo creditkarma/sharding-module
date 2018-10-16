@@ -40,14 +40,16 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                         'virtual-end': 3,
                         host: 'localhost',
                         port: 3306,
+                        user: 'root',
+                        password: 'root',
                     },
                 ],
             },
             hashFunction: murmurhash,
             createClient(databaseName, shardSettings) {
                 return mysql.createPool({
-                    user: 'root',
-                    password: 'root',
+                    user: shardSettings.user,
+                    password: shardSettings.password,
                     database: databaseName,
                     host: shardSettings.host,
                     port: shardSettings.port,
