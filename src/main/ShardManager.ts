@@ -29,6 +29,7 @@ export class ShardManager<Client> implements IShardManager<Client> {
         } else if (Number.isInteger(shardid)) {
             return Math.abs(shardid % this.numShards)
         } else {
+            this.logger.error(`shard ${shardid} invalid`)
             throw new Error('shardid must be a string or integer')
         }
     }
@@ -81,6 +82,7 @@ export class ShardManager<Client> implements IShardManager<Client> {
             return s['virtual-start'] <= num && s['virtual-end'] >= num
         })
         if (!shard) {
+            this.logger.error(`Missing shard ${num}`)
             throw new Error(`no shard found for ${num}`)
         }
         return shard
@@ -112,8 +114,10 @@ export class ShardManager<Client> implements IShardManager<Client> {
 
     private getShardName(num: number, schema: string): string {
         if (num < 0) {
+            this.logger.error(`Negative shard requested ${num}!!!`)
             throw new Error(`negative shard index (${num}) is invalid`)
         } else if (!Number.isInteger(num)) {
+            this.logger.error(`Invalid shard requested ${num}`)
             throw new Error(`non-integer shard index (${num}) is invalid`)
         } else {
             // Left pad the number to make sure it's 4 digits
