@@ -105,7 +105,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                         )`,
                     ),
                 )
-            }, {}),
+            }),
         )
     })
     afterEach(() => {
@@ -162,7 +162,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
             return sm.doForAllShards(shardIndex => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
                 return query(client, 'SELECT * FROM todos')
-            }, {})
+            })
         })
 
         // There should be a result set for each shard.

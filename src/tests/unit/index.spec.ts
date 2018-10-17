@@ -166,7 +166,7 @@ describe('Shard Manager', () => {
             }
             const responses = await sm.doForAllShards(shardIndex => {
                 return Promise.resolve(successfulResponse(shardIndex))
-            }, {})
+            })
             expect(responses).length(4)
             expect(responses).to.include([
                 successfulResponse(0),
@@ -193,7 +193,7 @@ describe('Shard Manager', () => {
                         sideEffects.push(shardIndex)
                         return Promise.resolve()
                     }
-                }, {})
+                })
             } catch (error) {
                 rejectionReason = error
             }

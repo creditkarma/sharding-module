@@ -34,9 +34,9 @@ export type ClientCreator<Client> = (
 
 export type HashFunction = (s: string, n: number) => number
 
-export type ShardOperation<Result> = (
+export type ShardOperation<Result, argType> = (
     shard: number,
-    opts: any,
+    opts?: argType,
 ) => Promise<Result>
 
 export interface IShardManager<Client> {
@@ -45,9 +45,9 @@ export interface IShardManager<Client> {
     getClient(num: number, schema: string): Client
     updateClient(num: number, schema: string): Client
     getNumShards(): number
-    doForAllShards<Result>(
-        op: ShardOperation<Result>,
-        args: any,
+    doForAllShards<Result, argType>(
+        op: ShardOperation<Result, argType>,
+        args?: argType,
     ): Promise<Array<Result>>
     findSettingsForShard(num: number): IShardInstance
 }
