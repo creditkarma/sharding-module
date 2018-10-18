@@ -19,7 +19,6 @@ helpers:
         echo "[ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\"" >> $BASH_ENV
 
 version: 2
-executorType: machine
 jobs:
   test:
     <<: *defaults
