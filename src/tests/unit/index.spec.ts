@@ -164,7 +164,7 @@ describe('Shard Manager', () => {
             function successfulResponse(shardIndex: number): string {
                 return `response for shard index ${shardIndex}`
             }
-            const responses = await sm.doForAllShards(shardIndex => {
+            const responses = await sm.doForAllShards((shardIndex: number) => {
                 return Promise.resolve(successfulResponse(shardIndex))
             })
             expect(responses).length(4)
@@ -183,7 +183,7 @@ describe('Shard Manager', () => {
             const sideEffects: Array<number> = []
             let rejectionReason
             try {
-                await sm.doForAllShards(shardIndex => {
+                await sm.doForAllShards((shardIndex: number) => {
                     // Fail on some of the shards.
                     if (shardIndex === 1 || shardIndex === 3) {
                         return Promise.reject(

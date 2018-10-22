@@ -4,7 +4,8 @@ import {
     ISettingsObj,
     IShardInstance,
     IShardManager,
-    ShardOperation,
+    ShardOperation1,
+    ShardOperation2,
 } from './types'
 
 export class ShardManager<Client> implements IShardManager<Client> {
@@ -64,13 +65,19 @@ export class ShardManager<Client> implements IShardManager<Client> {
         return this.shards[shardName]
     }
 
+    public doForAllShards<Result>(
+        op: ShardOperation1<Result>,
+    ): Promise<Array<Result>>
     public doForAllShards<Result, argType>(
-        op: ShardOperation<Result, argType>,
-        args?: argType,
-    ): Promise<Array<Result>> {
-        const requests: Array<Promise<Result>> = []
+        op: ShardOperation2<Result, argType>,
+        args: argType,
+    ): Promise<Array<Result>>
+    public doForAllShards(...args: Array<any>): Promise<Array<any>> {
+        const op = args[0]
+        const arg = args[1]
+        const requests: Array<Promise<any>> = []
         for (let i = 0; i < this.numShards; i++) {
-            const q = op(i, args)
+            const q = arg !== undefined ? op(i, arg) : op(i)
             requests.push(q)
         }
         return Promise.all(requests)

@@ -91,7 +91,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                 ),
             ),
         ]).then(() =>
-            sm.doForAllShards(shardIndex => {
+            sm.doForAllShards((shardIndex: number) => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
                 return query(client, 'DROP TABLE IF EXISTS todos').then(_ =>
                     query(
@@ -159,7 +159,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                 return query(todoClient, 'INSERT INTO todos SET ?', todo)
             }),
         ).then(() => {
-            return sm.doForAllShards(shardIndex => {
+            return sm.doForAllShards((shardIndex: number) => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
                 return query(client, 'SELECT * FROM todos')
             })
@@ -168,9 +168,12 @@ describe('Shard Manager', { timeout: 30000 }, () => {
         // There should be a result set for each shard.
         expect(resultSets).length(4)
 
-        const results: Array<any> = resultSets.reduce((flattened, element) => {
-            return flattened.concat(element, [])
-        })
+        const results: Array<any> = resultSets.reduce(
+            (flattened: Array<any>, element) => {
+                return flattened.concat(element, [])
+            },
+            [],
+        )
 
         expect(results).length(todos.length)
         todos.forEach(todo => {

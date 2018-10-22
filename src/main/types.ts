@@ -34,10 +34,16 @@ export type ClientCreator<Client> = (
 
 export type HashFunction = (s: string, n: number) => number
 
-export type ShardOperation<Result, argType> = (
+export type ShardOperation1<Result> = (shard: number) => Promise<Result>
+
+export type ShardOperation2<Result, arg> = (
     shard: number,
-    opts?: argType,
+    opts: arg,
 ) => Promise<Result>
+
+export type ShardOperation<Result, argType> =
+    ShardOperation1<Result> |
+    ShardOperation2<Result, argType>
 
 export interface IShardManager<Client> {
     getShard(shardid: number | string): number
