@@ -62,7 +62,7 @@ const shardMgr: IShardManager = createShardManager(sConfig, loggerFn)
 
 ### Public methods
 
-**shardMgr.getShard** Get the shard ID for a particular key.
+**getShard**: Get the shard ID for a particular key.
 
 * `key`: **String / Number**, the key to be sharded
 
@@ -73,21 +73,21 @@ const shardId: Number = shardMgr.getShard(key).catch((err) => {return err});
 This API throws an error if the key is not either a string or number.
 
 
-**shardMgr.pickRandomShard** Get a random shard from the available shards
+**pickRandomShard**: Get a random shard from the available shards
 
 ```typescript
 const randomShardId: Number = shardMgr.pickRandomShard()
 ```
 
 
-**shardMgr.getNumShards** Gets the number of shards being deployed
+**getNumShards**: Gets the number of shards being deployed
 
 ```typescript
 const noShards: Number = shardMgr.getNumShards()
 ```
 
 
-**shardMgr.getClient** Gets the client connection for a particular shard and prefix
+**getClient**: Gets the client connection for a particular shard and prefix
 
 * `shardId`: **number**, shard of the client
 * `prefix`: **string**, prefix of the client
@@ -97,7 +97,7 @@ const client = shardMgr.getClient(shardId. prefix)
 ```
 
 
-**shardMgr.findSettingsForShard** Gets the shard level settings for a given shardId
+**findSettingsForShard**: Gets the shard level settings for a given shardId
 
 * `shardId`: **number**, shardId of the database
 
@@ -106,7 +106,7 @@ const sMapObj: IShardInstance = shardMgr.findSettingsForShard(shardId)
 ```
 
 
-**shardMgr.updateClient** Re-establish the database client connection. Useful to recover from any dynamic changes in the env
+**updateClient**: Re-establish the database client connection. Useful to recover from any dynamic changes in the env
 
 * `shardId`: **number**, shardId of the database
 * `prefix`: **string**, prefix
@@ -116,7 +116,7 @@ const client = shardMgr.updateClient(shardId, prefix)
 ```
 
 
-**shardMgr.doForAllShards** Loops over all the shards and runs the given function for each of them
+**doForAllShards**: Loops over all the shards and runs the given function for each of them
 
 * `op`: **function**,
 * `opts`: **argType (optional)**,
