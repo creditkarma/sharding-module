@@ -54,15 +54,16 @@ export class ShardManager<Client> implements IShardManager<Client> {
         }
     }
 
-    public updateClient(num: number, schema: string): Client {
-        const shardName = this.getShardName(num, schema)
+    public updateClient(num: number, schema: string): void {
         const shardIndex = this.getShard(num)
         const shardSettings = this.findSettingsForShard(shardIndex)
-        this.shards[shardName] = this.settings.createClient(
-            shardName,
-            shardSettings,
-        )
-        return this.shards[shardName]
+        let start = shardSettings['virtual-start']
+        const end = shardSettings['virtual-end']
+        while(start <= end) {
+            const shardName = this.getShardName(start, schema)
+            this.shards[shardName] = this.settings.createClient(shardName, shardSettings);
+            start++
+        }
     }
 
     public doForAllShards<Result>(

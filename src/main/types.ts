@@ -49,7 +49,7 @@ export interface IShardManager<Client> {
     getShard(shardid: number | string): number
     pickRandomShard(): number
     getClient(num: number, schema: string): Client
-    updateClient(num: number, schema: string): Client
+    updateClient(num: number, schema: string): void
     getNumShards(): number
     doForAllShards<Result, argType>(
         op: ShardOperation<Result, argType>,
