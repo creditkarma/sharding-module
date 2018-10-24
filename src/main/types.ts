@@ -42,8 +42,8 @@ export type ShardOperation2<Result, arg> = (
 ) => Promise<Result>
 
 export type ShardOperation<Result, argType> =
-    ShardOperation1<Result> |
-    ShardOperation2<Result, argType>
+    | ShardOperation1<Result>
+    | ShardOperation2<Result, argType>
 
 export interface IShardManager<Client> {
     getShard(shardid: number | string): number
