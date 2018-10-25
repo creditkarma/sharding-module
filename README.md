@@ -97,22 +97,18 @@ const client = shardMgr.getClient(shardId. prefix)
 ```
 
 
-**findSettingsForShard**: Gets the shard level settings for a given shardId
-
-* `shardId`: **number**, shardId of the database
-
-```typescript
-const sMapObj: IShardInstance = shardMgr.findSettingsForShard(shardId)
-```
-
-
 **updateClient**: Re-establish the database client connection. Useful to recover from any dynamic changes in the env
 
 * `shardId`: **number**, shardId of the database
 * `prefix`: **string**, prefix
+* `newShardSettings`: **Partial<IShardInstance>**, updated shard settings
 
 ```typescript
-const client = shardMgr.updateClient(shardId, prefix)
+const newShardSettings: Partial<IShardInstance> = {
+    'host': <updatedIP>,
+    'port': <updatedPort>
+}
+const client = shardMgr.updateClient(shardId, prefix, newShardSettings)
 ```
 
 
