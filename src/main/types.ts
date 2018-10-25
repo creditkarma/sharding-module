@@ -41,19 +41,22 @@ export type ShardOperation2<Result, arg> = (
     opts: arg,
 ) => Promise<Result>
 
-export type ShardOperation<Result, argType> =
+export type ShardOperation<Result, ArgType> =
     | ShardOperation1<Result>
-    | ShardOperation2<Result, argType>
+    | ShardOperation2<Result, ArgType>
 
 export interface IShardManager<Client> {
     getShard(shardid: number | string): number
     pickRandomShard(): number
     getClient(num: number, schema: string): Client
-    updateClient(num: number, schema: string): void
+    updateClient(
+        num: number,
+        schema: string,
+        newShardSettings: Partial<IShardInstance>,
+    ): void
     getNumShards(): number
-    doForAllShards<Result, argType>(
-        op: ShardOperation<Result, argType>,
-        args?: argType,
+    doForAllShards<Result, ArgType>(
+        op: ShardOperation<Result, ArgType>,
+        args?: ArgType,
     ): Promise<Array<Result>>
-    findSettingsForShard(num: number): IShardInstance
 }

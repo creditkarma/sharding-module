@@ -54,9 +54,27 @@ export class ShardManager<Client> implements IShardManager<Client> {
         }
     }
 
-    public updateClient(num: number, schema: string): void {
+    public updateClient<K extends keyof IShardInstance>(
+        num: number,
+        schema: string,
+        newShardSettings: Partial<IShardInstance>,
+    ): void {
         const shardIndex = this.getShard(num)
         const shardSettings = this.findSettingsForShard(shardIndex)
+        const changedKeys: Array<K> = Object.keys(newShardSettings) as Array<K>
+        let dbChanged: boolean = false
+
+        changedKeys.forEach((key: K) => {
+            if (newShardSettings[key] !== shardSettings[key]) {
+                dbChanged = true
+                shardSettings[key] = newShardSettings[key] as IShardInstance[K]
+            }
+        })
+
+        if (!dbChanged) {
+            return
+        }
+
         let start = shardSettings['virtual-start']
         const end = shardSettings['virtual-end']
         while (start <= end) {
@@ -76,18 +94,22 @@ export class ShardManager<Client> implements IShardManager<Client> {
         op: ShardOperation2<Result, argType>,
         args: argType,
     ): Promise<Array<Result>>
-    public doForAllShards(...args: Array<any>): Promise<Array<any>> {
-        const op = args[0]
-        const arg = args[1]
+    public doForAllShards<Result, ArgType>(
+        op: ShardOperation1<Result> | ShardOperation2<Result, ArgType>,
+        arg?: ArgType,
+    ): Promise<Array<any>> {
         const requests: Array<Promise<any>> = []
         for (let i = 0; i < this.numShards; i++) {
-            const q = arg !== undefined ? op(i, arg) : op(i)
+            const q =
+                arg !== undefined
+                    ? (op as ShardOperation2<Result, ArgType>)(i, arg)
+                    : (op as ShardOperation1<Result>)(i)
             requests.push(q)
         }
         return Promise.all(requests)
     }
 
-    public findSettingsForShard(num: number): IShardInstance {
+    private findSettingsForShard(num: number): IShardInstance {
         const shardList = this.settings.sharding['shard-map']
         const shard = shardList.find(s => {
             return s['virtual-start'] <= num && s['virtual-end'] >= num

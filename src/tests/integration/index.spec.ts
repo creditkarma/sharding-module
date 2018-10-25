@@ -196,4 +196,55 @@ describe('Shard Manager', { timeout: 30000 }, () => {
             .then(_ => fail('execution should not reach here'))
             .catch(err => expect(err).to.error(Error, /\bER_PARSE_ERROR\b/))
     })
+
+    it('should successfully recover with updateClient API', async () => {
+        const sm2 = shardMgr(
+            {
+                sharding: {
+                    prefix: ['example_todoId'],
+                    'shard-count': 4,
+                    'shard-map': [
+                        {
+                            'virtual-start': 0,
+                            'virtual-end': 3,
+                            host: 'localhost',
+                            port: 3307,
+                            user: 'root',
+                            password: 'root',
+                        },
+                    ],
+                },
+                hashFunction: murmurhash,
+                createClient(databaseName, shardSettings) {
+                    return mysql.createPool({
+                        user: shardSettings.user,
+                        password: shardSettings.password,
+                        database: databaseName,
+                        host: shardSettings.host,
+                        port: shardSettings.port,
+                    })
+                },
+            },
+            console,
+        )
+
+        const shard = sm.getShard(0)
+        let client = sm2.getClient(shard, 'example_todoId')
+
+        let result = await query(client, 'SELECT "hello world" AS foo').catch(
+            err => {
+                return err.message
+            },
+        )
+        expect(result).to.equal('connect ECONNREFUSED 127.0.0.1:3307')
+
+        const newSchema = {
+            port: 3306,
+        }
+        sm2.updateClient(0, 'example_todoId', newSchema)
+        client = sm2.getClient(shard, 'example_todoId')
+
+        result = await query(client, 'SELECT "hello world" AS foo')
+        expect(result).to.equal([{ foo: 'hello world' }])
+    })
 })

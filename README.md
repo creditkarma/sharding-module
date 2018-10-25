@@ -4,7 +4,7 @@
 
 ## Installation
 
-``` typescript
+``` bash
 npm install @creditkarma/sharding-module
 ```
 

@@ -159,6 +159,30 @@ describe('Shard Manager', () => {
         })
     })
 
+    describe('updateClient', () => {
+        it('should update the shard cfg appropriately', async () => {
+            const testShardId = 3
+            let newShardSettings: Partial<IShardInstance> = {
+                host: 'why-localhost.com',
+                port: 9999,
+            }
+
+            sm.updateClient(testShardId, testSchemaName, newShardSettings)
+            let connectionConfig = (sm.getClient(testShardId, testSchemaName)
+                .config as IFixedPoolConfig).connectionConfig
+            expect(connectionConfig).to.include(newShardSettings)
+
+            newShardSettings = {
+                host: 'not-localhost.com',
+                port: 1337,
+            }
+            sm.updateClient(testShardId, testSchemaName, newShardSettings)
+            connectionConfig = (sm.getClient(testShardId, testSchemaName)
+                .config as IFixedPoolConfig).connectionConfig
+            expect(connectionConfig).to.include(newShardSettings)
+        })
+    })
+
     describe('doForAllShards', () => {
         it('should apply the given function to every shard', async () => {
             function successfulResponse(shardIndex: number): string {
