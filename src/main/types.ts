@@ -10,6 +10,8 @@ export interface IShardInstance {
     'virtual-end': number
     host: string
     port: number
+    user: string
+    password: string
 }
 
 export interface IShardObj {
@@ -32,12 +34,29 @@ export type ClientCreator<Client> = (
 
 export type HashFunction = (s: string, n: number) => number
 
-export type ShardOperation<Result> = (shard: number) => Promise<Result>
+export type ShardOperation1<Result> = (shard: number) => Promise<Result>
+
+export type ShardOperation2<Result, arg> = (
+    shard: number,
+    opts: arg,
+) => Promise<Result>
+
+export type ShardOperation<Result, ArgType> =
+    | ShardOperation1<Result>
+    | ShardOperation2<Result, ArgType>
 
 export interface IShardManager<Client> {
     getShard(shardid: number | string): number
     pickRandomShard(): number
     getClient(num: number, schema: string): Client
+    updateClient(
+        num: number,
+        schema: string,
+        newShardSettings: Partial<IShardInstance>,
+    ): void
     getNumShards(): number
-    doForAllShards<Result>(op: ShardOperation<Result>): Promise<Array<Result>>
+    doForAllShards<Result, ArgType>(
+        op: ShardOperation<Result, ArgType>,
+        args?: ArgType,
+    ): Promise<Array<Result>>
 }

@@ -40,14 +40,16 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                         'virtual-end': 3,
                         host: 'localhost',
                         port: 3306,
+                        user: 'root',
+                        password: 'root',
                     },
                 ],
             },
             hashFunction: murmurhash,
             createClient(databaseName, shardSettings) {
                 return mysql.createPool({
-                    user: 'root',
-                    password: 'root',
+                    user: shardSettings.user,
+                    password: shardSettings.password,
                     database: databaseName,
                     host: shardSettings.host,
                     port: shardSettings.port,
@@ -89,7 +91,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                 ),
             ),
         ]).then(() =>
-            sm.doForAllShards(shardIndex => {
+            sm.doForAllShards((shardIndex: number) => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
                 return query(client, 'DROP TABLE IF EXISTS todos').then(_ =>
                     query(
@@ -157,7 +159,7 @@ describe('Shard Manager', { timeout: 30000 }, () => {
                 return query(todoClient, 'INSERT INTO todos SET ?', todo)
             }),
         ).then(() => {
-            return sm.doForAllShards(shardIndex => {
+            return sm.doForAllShards((shardIndex: number) => {
                 const client = sm.getClient(shardIndex, 'example_todoId')
                 return query(client, 'SELECT * FROM todos')
             })
@@ -166,9 +168,12 @@ describe('Shard Manager', { timeout: 30000 }, () => {
         // There should be a result set for each shard.
         expect(resultSets).length(4)
 
-        const results: Array<any> = resultSets.reduce((flattened, element) => {
-            return flattened.concat(element, [])
-        })
+        const results: Array<any> = resultSets.reduce(
+            (flattened: Array<any>, element) => {
+                return flattened.concat(element, [])
+            },
+            [],
+        )
 
         expect(results).length(todos.length)
         todos.forEach(todo => {
@@ -190,5 +195,56 @@ describe('Shard Manager', { timeout: 30000 }, () => {
         await query(client, 'this is not a valid SQL string')
             .then(_ => fail('execution should not reach here'))
             .catch(err => expect(err).to.error(Error, /\bER_PARSE_ERROR\b/))
+    })
+
+    it('should successfully recover with updateClient API', async () => {
+        const sm2 = shardMgr(
+            {
+                sharding: {
+                    prefix: ['example_todoId'],
+                    'shard-count': 4,
+                    'shard-map': [
+                        {
+                            'virtual-start': 0,
+                            'virtual-end': 3,
+                            host: 'localhost',
+                            port: 3307,
+                            user: 'root',
+                            password: 'root',
+                        },
+                    ],
+                },
+                hashFunction: murmurhash,
+                createClient(databaseName, shardSettings) {
+                    return mysql.createPool({
+                        user: shardSettings.user,
+                        password: shardSettings.password,
+                        database: databaseName,
+                        host: shardSettings.host,
+                        port: shardSettings.port,
+                    })
+                },
+            },
+            console,
+        )
+
+        const shard = sm.getShard(0)
+        let client = sm2.getClient(shard, 'example_todoId')
+
+        let result = await query(client, 'SELECT "hello world" AS foo').catch(
+            err => {
+                return err.message
+            },
+        )
+        expect(result).to.equal('connect ECONNREFUSED 127.0.0.1:3307')
+
+        const newSchema = {
+            port: 3306,
+        }
+        sm2.updateClient(0, 'example_todoId', newSchema)
+        client = sm2.getClient(shard, 'example_todoId')
+
+        result = await query(client, 'SELECT "hello world" AS foo')
+        expect(result).to.equal([{ foo: 'hello world' }])
     })
 })

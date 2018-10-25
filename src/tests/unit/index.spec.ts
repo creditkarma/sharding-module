@@ -37,19 +37,23 @@ describe('Shard Manager', () => {
                     'virtual-end': 2,
                     host: 'localhost',
                     port: 3306,
+                    user: 'testuser',
+                    password: 'testpassword',
                 },
                 {
                     'virtual-start': 3,
                     'virtual-end': 3,
                     host: 'not-localhost.com',
                     port: 1337,
+                    user: 'testuser',
+                    password: 'testpassword',
                 },
             ],
         },
         createClient: (databaseName: string, shardSettings: IShardInstance) => {
             return mysql.createPool({
-                user: 'testuser',
-                password: 'testpassword',
+                user: shardSettings.user,
+                password: shardSettings.password,
                 database: databaseName,
                 host: shardSettings.host,
                 port: shardSettings.port,
@@ -155,12 +159,36 @@ describe('Shard Manager', () => {
         })
     })
 
+    describe('updateClient', () => {
+        it('should update the shard cfg appropriately', async () => {
+            const testShardId = 3
+            let newShardSettings: Partial<IShardInstance> = {
+                host: 'why-localhost.com',
+                port: 9999,
+            }
+
+            sm.updateClient(testShardId, testSchemaName, newShardSettings)
+            let connectionConfig = (sm.getClient(testShardId, testSchemaName)
+                .config as IFixedPoolConfig).connectionConfig
+            expect(connectionConfig).to.include(newShardSettings)
+
+            newShardSettings = {
+                host: 'not-localhost.com',
+                port: 1337,
+            }
+            sm.updateClient(testShardId, testSchemaName, newShardSettings)
+            connectionConfig = (sm.getClient(testShardId, testSchemaName)
+                .config as IFixedPoolConfig).connectionConfig
+            expect(connectionConfig).to.include(newShardSettings)
+        })
+    })
+
     describe('doForAllShards', () => {
         it('should apply the given function to every shard', async () => {
             function successfulResponse(shardIndex: number): string {
                 return `response for shard index ${shardIndex}`
             }
-            const responses = await sm.doForAllShards(shardIndex => {
+            const responses = await sm.doForAllShards((shardIndex: number) => {
                 return Promise.resolve(successfulResponse(shardIndex))
             })
             expect(responses).length(4)
@@ -179,7 +207,7 @@ describe('Shard Manager', () => {
             const sideEffects: Array<number> = []
             let rejectionReason
             try {
-                await sm.doForAllShards(shardIndex => {
+                await sm.doForAllShards((shardIndex: number) => {
                     // Fail on some of the shards.
                     if (shardIndex === 1 || shardIndex === 3) {
                         return Promise.reject(
