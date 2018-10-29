@@ -126,6 +126,9 @@ OR
 const results: Array<Result> = shardMgr.doForAllShards(op, opts)
 ```
 
+## Contributing
+
+For more information about contributing new features and bug fixes, see our [Contribution Guidelines](./CONTRIBUTING.md).
 
 ## License
 
