@@ -1,5 +1,5 @@
 {
-  "name": "shard-manager",
+  "name": "@creditkarma/shard-manager",
   "version": "0.0.0",
   "description": "",
   "main": "lib/main/index.js",
