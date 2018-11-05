@@ -16,7 +16,7 @@ node_modules
 .npm
 
 # Typescript artifacts
-lib
+dist
 
 # nyc artifacts
 coverage/
